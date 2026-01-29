@@ -4,6 +4,7 @@
 #include "append.c"
 
 int main() {
-  printf("%d\n", gcd(12, 15));
+  freeTable(1);
+  printf("%s\n", GlobalTable.path);
   return 0;
 }

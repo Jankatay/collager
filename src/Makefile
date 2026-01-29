@@ -1,4 +1,4 @@
-CC= gcc 
+CC= gcc -g
 LIBSTB= stb/stb_image.o stb/stb_image_resize2.o stb/stb_image_write.o
 CFLAGS= -Wall -Wextra -Werror
 LFLAGS= -lm

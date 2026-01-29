@@ -2,7 +2,16 @@
 #ifndef BASE_C 
 #define BASE_C 
 
+// std
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 
+// unix
+#include <unistd.h>
+
+// stb
+#include "stb/stb_image.h"
 #include "stb/stb_image_resize2.h"
 
 
@@ -30,22 +39,41 @@ struct Image {
 #define INVALID_IMG(img) ((!img) || (img->numComponents <= 0) || (img->width <= 0) || (img->height <= 0) || (!img->data))
 
 
+// the only crucial info about an image in the table 
+// -----------------------------------------------------------------
+struct ImageEntry {
+  unsigned int width;
+  unsigned int height;
+};
+
+
 // table for the image descriptors
 // rest of program will uses it to access them
+// the physical files will be in `path/0, path/1, ..., path/tableLen`
+// path will be a temporary folder, in that sense descriptors let you find the file too
 // -----------------------------------------------------------------
 struct ImageTable {
-  struct Image* images; // array
-  size_t tableLen;      // length
-};
+  struct ImageEntry* entries; // array
+  size_t tableLen;            // length
+} GlobalTable = {};
 
 
-// initialize a table for given length
-// 
+// just initializes the GlobalTable, nothing more.
 // -----------------------------------------------------------------
-struct ImageTable freeTable(size_t len) {
-  (void)len;
-  return (struct ImageTable){};
+void freeTable(size_t len) {
+  // set the values
+  GlobalTable.entries = calloc(len, sizeof(struct ImageEntry));
+  GlobalTable.tableLen = len;
 };
+
+
+// add an image to the table 
+// -----------------------------------------------------------------
+int openImage(char path[PATH_MAX]) {
+  int width, height, componentsRatio;
+  unsigned char* data = stbi_load(path, &width, &height, &componentsRatio, 0);
+  return data == NULL;
+}
 
 
 // greatest common denominator of two variables
@@ -61,7 +89,7 @@ int gcd(size_t a, size_t b) {
 }
 
 
-// least common multiple using gcd 
+// calculate least common multiple quickly using gcd 
 // -----------------------------------------------------------------
 #define LCM(a,b) (a*b/gcd(a,b))
 
